@@ -1,0 +1,149 @@
+// Prisma Schema para Feedback Loja (Configuração PostgreSQL para Produção / Docker)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("ATTENDANT") // "ADMIN" | "MANAGER" | "ATTENDANT"
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignedComplaints Complaint[]
+  internalNotes      InternalNote[]
+  auditEvents        AuditEvent[]
+
+  @@index([email])
+}
+
+model Table {
+  id        String   @id @default(cuid())
+  number    Int      @unique
+  name      String
+  slug      String   @unique
+  token     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviews   Review[]
+
+  @@index([slug])
+  @@index([token])
+}
+
+model Review {
+  id             String     @id @default(cuid())
+  rating         Int
+  comment        String?
+  tableId        String?
+  table          Table?     @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  viewedByStaff  Boolean    @default(false)
+  protocol       String     @unique
+  ipHash         String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  complaint      Complaint?
+
+  @@index([rating])
+  @@index([createdAt])
+  @@index([protocol])
+}
+
+model Complaint {
+  id                String             @id @default(cuid())
+  reviewId          String             @unique
+  review            Review             @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  protocol          String             @unique
+  category          String             // ATENDIMENTO, DEMORA, PEDIDO_INCORRETO, QUALIDADE, LIMPEZA, AMBIENTE, PAGAMENTO, OUTRO
+  description       String
+  status            String             @default("NOVA") // NOVA, EM_ATENDIMENTO, AGUARDANDO_RETORNO, RESOLVIDA, ARQUIVADA
+  customerName      String?
+  customerPhone     String?
+  customerEmail     String?
+  contactPreference String?            // WHATSAPP, EMAIL, TELEFONE, NENHUM
+  requestContact    Boolean            @default(false)
+  assignedToId      String?
+  assignedTo        User?              @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  resolvedAt        DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  notes             InternalNote[]
+  history           ComplaintHistory[]
+
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@index([protocol])
+}
+
+model InternalNote {
+  id          String    @id @default(cuid())
+  complaintId String
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String
+  createdAt   DateTime  @default(now())
+
+  @@index([complaintId])
+}
+
+model ComplaintHistory {
+  id             String    @id @default(cuid())
+  complaintId    String
+  complaint      Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  userId         String?
+  userName       String?
+  action         String
+  details        String
+  previousStatus String?
+  newStatus      String?
+  createdAt      DateTime  @default(now())
+
+  @@index([complaintId])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String
+  resource   String
+  resourceId String?
+  ipAddress  String?
+  details    String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([resource])
+  @@index([createdAt])
+}
+
+model StoreConfig {
+  id               String   @id @default("default")
+  storeName        String   @default("Sabor & Arte Bistrô")
+  logoUrl          String?
+  description      String?  @default("Experiência gastronômica e atendimento premium")
+  welcomeMessage   String   @default("Como foi sua experiência?")
+  subtitleMessage  String   @default("Sua opinião é fundamental para melhorarmos cada vez mais.")
+  thankYouPositive String   @default("Obrigado por compartilhar sua experiência! Esperamos vê-lo novamente em breve.")
+  thankYouNegative String   @default("Sentimos muito pelo ocorrido. Nossa equipe foi notificada e já estamos analisando o que aconteceu.")
+  slaHours         Int      @default(24)
+  phone            String?  @default("(11) 98765-4321")
+  email            String?  @default("contato@saborearte.com.br")
+  address          String?  @default("Av. Paulista, 1000 - São Paulo, SP")
+  businessHours    String?  @default("Terça a Domingo das 11h30 às 23h00")
+  updatedAt        DateTime @updatedAt
+}

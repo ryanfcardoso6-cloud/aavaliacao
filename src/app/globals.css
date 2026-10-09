@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 30, 50, 32; /* Verde Profundo Borelli */
+  --background-rgb: 251, 248, 241; /* Branco Amarelado Clássico Creme */
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: rgb(var(--background-rgb));
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* Faixa Italiana Tridimensional Borelli */
+.italian-stripe {
+  background: linear-gradient(
+    to bottom,
+    #009246 0%, #009246 33.33%,
+    #ffffff 33.33%, #ffffff 66.66%,
+    #ce2b37 66.66%, #ce2b37 100%
+  );
+}
+
+.italian-stripe-h {
+  background: linear-gradient(
+    to right,
+    #009246 0%, #009246 33.33%,
+    #ffffff 33.33%, #ffffff 66.66%,
+    #ce2b37 66.66%, #ce2b37 100%
+  );
+}
+
+/* Estilos de impressão dedicados para Placas e QR Codes de Mesa */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .print-card {
+    border: 2px dashed #325032 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 2rem !important;
+  }
+}

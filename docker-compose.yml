@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: feedback_loja_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: feedback_admin
+      POSTGRES_PASSWORD: senha_segura_postgres_123
+      POSTGRES_DB: feedback_loja
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U feedback_admin -d feedback_loja"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: feedback_loja_app
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://feedback_admin:senha_segura_postgres_123@postgres:5432/feedback_loja?schema=public"
+      JWT_SECRET: "substitua_por_uma_chave_secreta_super_forte_com_mais_de_32_chars_2026"
+      NEXT_PUBLIC_APP_URL: "https://seu-dominio.com.br"
+      ADMIN_INITIAL_EMAIL: "admin@loja.com"
+      ADMIN_INITIAL_PASSWORD: "Admin@Seguro123"
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
