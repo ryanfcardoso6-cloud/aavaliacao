@@ -37,7 +37,7 @@ export async function GET(
         width: 600,
         margin: 2,
         color: {
-          dark: '#0f172a',
+          dark: '#1E3A24',
           light: '#ffffff',
         },
         errorCorrectionLevel: 'H',
@@ -56,7 +56,7 @@ export async function GET(
       width: 400,
       margin: 2,
       color: {
-        dark: '#0f172a',
+        dark: '#1E3A24',
         light: '#ffffff',
       },
       errorCorrectionLevel: 'H',
