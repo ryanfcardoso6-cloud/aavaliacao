@@ -16,7 +16,10 @@ import {
   Clock,
   CheckCircle2,
   AlertTriangle,
+  MessageCircle,
+  Check,
 } from 'lucide-react';
+import { getWhatsAppUrl } from '@/lib/whatsapp';
 
 const STATUS_BADGES: Record<string, { bg: string; text: string; label: string }> = {
   NOVA: { bg: 'bg-rose-100 border-rose-200', text: 'text-rose-700', label: 'Nova' },
@@ -116,19 +119,20 @@ export default function ReclamacoesPage() {
             { id: 'NOVA', label: 'Novas' },
             { id: 'EM_ATENDIMENTO', label: 'Em Atendimento' },
             { id: 'AGUARDANDO_RETORNO', label: 'Aguardando Retorno' },
-            { id: 'RESOLVIDA', label: 'Resolvidas' },
+            { id: 'RESOLVIDA', label: 'Resolvidas', isCheck: true },
             { id: 'ARQUIVADA', label: 'Arquivadas' },
           ].map((st) => (
             <button
               key={st.id}
               onClick={() => setStatus(st.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition ${
                 status === st.id
                   ? 'bg-[#1E3A24] text-white border-[#1E3A24] shadow-sm'
                   : 'bg-white text-[#5C665D] border-[#CBD8CB] hover:bg-[#FAF7F0]'
               }`}
             >
-              {st.label}
+              {st.isCheck && <CheckCircle2 className={`w-3.5 h-3.5 ${status === st.id ? 'text-emerald-300' : 'text-emerald-600'}`} />}
+              <span>{st.label}</span>
             </button>
           ))}
         </div>
@@ -181,6 +185,9 @@ export default function ReclamacoesPage() {
                           {comp.status === 'NOVA' && (
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
                           )}
+                          {comp.status === 'RESOLVIDA' && (
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          )}
                           <span>{badge.label}</span>
                         </span>
                       </td>
@@ -204,10 +211,16 @@ export default function ReclamacoesPage() {
                             </div>
                             <div className="text-[11px] text-[#7D877E] flex items-center gap-2">
                               {comp.customerPhone && (
-                                <span className="flex items-center gap-1">
-                                  <Phone className="w-3 h-3 text-[#3F643E]" />
-                                  {comp.customerPhone}
-                                </span>
+                                <a
+                                  href={getWhatsAppUrl(comp.customerPhone, comp.customerName) || `tel:${comp.customerPhone}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold hover:underline"
+                                  title="Abrir no WhatsApp"
+                                >
+                                  <MessageCircle className="w-3 h-3 text-[#25D366]" />
+                                  <span>{comp.customerPhone}</span>
+                                </a>
                               )}
                               {comp.customerEmail && (
                                 <span className="flex items-center gap-1">

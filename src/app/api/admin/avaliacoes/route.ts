@@ -78,6 +78,7 @@ export async function GET(req: NextRequest) {
               status: true,
               category: true,
               customerName: true,
+              customerPhone: true,
               requestContact: true,
             },
           },

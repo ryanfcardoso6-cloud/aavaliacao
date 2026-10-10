@@ -14,7 +14,9 @@ import {
   Calendar,
   X,
   RefreshCw,
+  MessageCircle,
 } from 'lucide-react';
+import { getWhatsAppUrl } from '@/lib/whatsapp';
 
 export default function AvaliacoesPage() {
   const [reviews, setReviews] = useState<any[]>([]);
@@ -269,14 +271,20 @@ export default function AvaliacoesPage() {
                       {rev.complaint ? (
                         <Link
                           href={`/admin/reclamacoes/${rev.complaint.id}`}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                            rev.complaint.status === 'NOVA'
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                            rev.complaint.status === 'RESOLVIDA'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                              : rev.complaint.status === 'NOVA'
                               ? 'bg-rose-100 text-rose-700'
                               : 'bg-amber-100 text-amber-700'
                           }`}
                         >
-                          <MessageSquareWarning className="w-3 h-3" />
-                          <span>{rev.complaint.status}</span>
+                          {rev.complaint.status === 'RESOLVIDA' ? (
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          ) : (
+                            <MessageSquareWarning className="w-3 h-3" />
+                          )}
+                          <span>{rev.complaint.status === 'RESOLVIDA' ? 'Resolvida' : rev.complaint.status}</span>
                         </Link>
                       ) : (
                         <span className="text-slate-400">—</span>
@@ -376,12 +384,25 @@ export default function AvaliacoesPage() {
               {selectedReview.complaint && (
                 <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-rose-800 flex items-center gap-1.5">
-                      <MessageSquareWarning className="w-4 h-4 text-rose-600" />
+                    <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                      {selectedReview.complaint.status === 'RESOLVIDA' ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      ) : (
+                        <MessageSquareWarning className="w-4 h-4 text-rose-600" />
+                      )}
                       Reclamação Vinculada
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-200 text-rose-800">
-                      {selectedReview.complaint.status}
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        selectedReview.complaint.status === 'RESOLVIDA'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          : 'bg-rose-200 text-rose-800'
+                      }`}
+                    >
+                      {selectedReview.complaint.status === 'RESOLVIDA' && (
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      )}
+                      <span>{selectedReview.complaint.status}</span>
                     </span>
                   </div>
                   <div className="text-slate-700 text-xs">
@@ -390,6 +411,21 @@ export default function AvaliacoesPage() {
                   {selectedReview.complaint.customerName && (
                     <div className="text-slate-700 text-xs">
                       <strong>Cliente:</strong> {selectedReview.complaint.customerName}
+                    </div>
+                  )}
+                  {selectedReview.complaint.customerPhone && (
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-slate-700 text-xs font-semibold">Contato:</span>
+                      <a
+                        href={getWhatsAppUrl(selectedReview.complaint.customerPhone, selectedReview.complaint.customerName) || `tel:${selectedReview.complaint.customerPhone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-sm transition"
+                        title="Abrir conversa no WhatsApp"
+                      >
+                        <MessageCircle className="w-3 h-3" />
+                        <span>{selectedReview.complaint.customerPhone} (WhatsApp)</span>
+                      </a>
                     </div>
                   )}
                   <div className="pt-2">

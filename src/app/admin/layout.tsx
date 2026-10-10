@@ -52,15 +52,29 @@ export default function AdminLayout({
       });
 
     // Atualiza contagem de novos alertas
-    fetch('/api/admin/dashboard')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.kpis) {
-          setUnreadCount(data.kpis.newComplaintsCount || 0);
-        }
-      })
-      .catch(() => {});
-  }, [router]);
+    const fetchAlerts = () => {
+      if (pathname.startsWith('/admin/reclamacoes')) {
+        setUnreadCount(0);
+        return;
+      }
+      fetch('/api/admin/dashboard')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.kpis && !pathname.startsWith('/admin/reclamacoes')) {
+            setUnreadCount(data.kpis.newComplaintsCount || 0);
+          } else {
+            setUnreadCount(0);
+          }
+        })
+        .catch(() => {});
+    };
+
+    fetchAlerts();
+
+    const handleUpdate = () => fetchAlerts();
+    window.addEventListener('complaint-updated', handleUpdate);
+    return () => window.removeEventListener('complaint-updated', handleUpdate);
+  }, [router, pathname]);
 
   const handleLogout = async () => {
     try {
@@ -78,7 +92,7 @@ export default function AdminLayout({
       label: 'Reclamações',
       href: '/admin/reclamacoes',
       icon: MessageSquareWarning,
-      badge: unreadCount > 0 ? unreadCount : null,
+      badge: unreadCount > 0 && !pathname.startsWith('/admin/reclamacoes') ? unreadCount : null,
     },
     { label: 'Mesas e QR Codes', href: '/admin/mesas', icon: QrCode },
     { label: 'Relatórios', href: '/admin/relatorios', icon: BarChart3 },
@@ -147,7 +161,7 @@ export default function AdminLayout({
                   <span>{item.label}</span>
                 </div>
                 {item.badge && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#CE2B37] text-white animate-pulse">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#CE2B37] text-white">
                     {item.badge}
                   </span>
                 )}
