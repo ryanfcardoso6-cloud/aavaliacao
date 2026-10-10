@@ -140,7 +140,7 @@ function AvaliarForm() {
         return;
       }
 
-      router.push(`/sucesso?protocolo=${encodeURIComponent(data.protocol)}&nota=${rating}`);
+      router.push(`/sucesso?nota=${rating}${mesaParam ? `&mesa=${encodeURIComponent(mesaParam)}` : ''}`);
     } catch (err) {
       console.error(err);
       setErrorMessage('Erro de conexão com o servidor. Verifique sua internet.');

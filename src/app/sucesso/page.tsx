@@ -1,36 +1,31 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2, Copy, Check, ArrowLeft, ShieldCheck, Loader2 } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, HeartHandshake, Loader2, RotateCcw } from 'lucide-react';
 
 function SucessoContent() {
   const searchParams = useSearchParams();
-  const protocol = searchParams.get('protocolo') || 'PRT-REGISTRADO';
   const rating = parseInt(searchParams.get('nota') || '5');
-
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(protocol);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
-  };
+  const mesaToken = searchParams.get('mesa');
 
   const isPositive = rating >= 4;
 
+  const returnUrl = mesaToken ? `/avaliar?mesa=${mesaToken}` : '/avaliar';
+
   return (
     <div className="max-w-md w-full mx-auto my-auto bg-white rounded-3xl shadow-xl shadow-[#1E3A24]/5 border border-[#EAE3D2] p-6 sm:p-10 text-center relative overflow-hidden">
-      {/* Faixa Tricolor Italiana */}
+      {/* Faixa Tricolor Italiana Borelli */}
       <div className="absolute top-0 left-0 right-0 h-1.5 flex">
         <div className="w-1/3 bg-[#009246]" />
         <div className="w-1/3 bg-[#FFFFFF]" />
         <div className="w-1/3 bg-[#CE2B37]" />
       </div>
 
+      {/* Logo Gelato Borelli */}
       <div className="mb-4 flex justify-center">
-        <div className="p-2 bg-[#FAF7F0] rounded-2xl border border-[#EAE3D2] inline-block">
+        <div className="p-2.5 bg-[#FAF7F0] rounded-2xl border border-[#EAE3D2] inline-block shadow-sm">
           <img
             src="/logo-borelli.png"
             alt="Gelato Borelli"
@@ -39,59 +34,40 @@ function SucessoContent() {
         </div>
       </div>
 
+      {/* Ícone de Sucesso */}
       <div className="w-16 h-16 mx-auto bg-[#F4F7F4] text-[#1E3A24] rounded-2xl flex items-center justify-center mb-4 border border-[#CBD8CB]">
-        <CheckCircle2 className="w-10 h-10" />
+        <CheckCircle2 className="w-10 h-10 text-[#1E3A24]" />
       </div>
 
       <h1 className="text-xl sm:text-2xl font-extrabold text-[#1E3A24] tracking-tight">
-        {isPositive ? 'Molto Grazie! Feedback Recebido' : 'Obrigado por nos avisar!'}
+        {isPositive ? 'Avaliação Recebida com Sucesso!' : 'Mensagem Recebida com Sucesso!'}
       </h1>
 
-      <p className="mt-2 text-xs sm:text-sm text-[#5C665D] leading-relaxed">
+      <p className="mt-3 text-xs sm:text-sm text-[#5C665D] leading-relaxed">
         {isPositive
-          ? 'Sua avaliação foi repassada com entusiasmo para nossos mestres gelatieres e equipe de atendimento da Gelato Borelli!'
-          : 'Sua mensagem foi registrada em canal prioritário. Nossa gerência já foi notificada para analisar o ocorrido e prestar o devido suporte.'}
+          ? 'Molto grazie! Sua opinião foi registrada com carinho e compartilhada com toda a nossa equipe da Gelato Borelli.'
+          : 'Agradecemos por nos avisar. Seu relato foi recebido diretamente pela nossa gerência para cuidarmos com total atenção e prioridade.'}
       </p>
 
-      {/* Protocolo */}
-      <div className="mt-6 p-4 bg-[#FAF7F0] rounded-2xl border border-[#EAE3D2] text-left">
-        <span className="text-[11px] font-bold text-[#7D877E] uppercase tracking-wider block">
-          Protocolo de Atendimento
-        </span>
-        <div className="mt-1.5 flex items-center justify-between gap-3 bg-white px-3 py-2 rounded-xl border border-[#EAE3D2]">
-          <span className="font-mono text-sm font-bold text-[#1E3A24] tracking-wider">
-            {protocol}
-          </span>
-          <button
-            onClick={handleCopy}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF7F0] hover:bg-[#EAE3D2] text-xs font-semibold text-[#1E3A24] transition"
-            title="Copiar protocolo"
-          >
-            {copied ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-emerald-700">Copiado</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-3.5 h-3.5" />
-                <span>Copiar</span>
-              </>
-            )}
-          </button>
+      {/* Bloco de Mensagem Calorosa */}
+      <div className="mt-6 p-4 bg-[#FAF7F0] rounded-2xl border border-[#EAE3D2] text-center">
+        <div className="flex items-center justify-center gap-2 text-[#1E3A24] font-bold text-xs sm:text-sm mb-1">
+          <HeartHandshake className="w-4 h-4 text-[#CE2B37]" />
+          <span>Gelato Borelli Agradece!</span>
         </div>
-        <p className="text-[10px] text-[#7D877E] mt-1.5">
-          Guarde este código para qualquer contato futuro com nossa gerência.
+        <p className="text-xs text-[#6B756C] leading-relaxed">
+          Pode fechar esta página no seu celular. Desejamos que você tenha um momento muito especial e saboroso conosco!
         </p>
       </div>
 
+      {/* Botão sutil caso queira avaliar novamente (NÃO vai para o admin) */}
       <div className="mt-6">
         <Link
-          href="/"
-          className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-2xl bg-[#1E3A24] hover:bg-[#2A4E32] text-[#FAF7F0] font-bold text-sm shadow transition active:scale-[0.98]"
+          href={returnUrl}
+          className="inline-flex items-center justify-center gap-2 w-full py-3 px-5 rounded-2xl bg-[#FAF7F0] hover:bg-[#EAE3D2] text-[#1E3A24] font-semibold text-xs border border-[#CBD8CB] transition"
         >
-          <ArrowLeft className="w-4 h-4 text-amber-400" />
-          <span>Voltar ao Início</span>
+          <RotateCcw className="w-3.5 h-3.5 text-[#1E3A24]" />
+          <span>Fazer nova avaliação</span>
         </Link>
       </div>
 
